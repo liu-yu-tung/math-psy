@@ -96,18 +96,75 @@ nll.freeVariance=function(par,dat) {
     return(result)
 }
 
+ds.amount.of.bias=function(b,p) {
+    ifelse(b>0, (1-p)*b, p*b)
+}
+
+nll.lowThreshold.1=function(b,y,det) {
+    ds=det[1]
+    dn=det[2]
+    p=1:4
+    p[1]=ds.amount.of.bias(b,ds)
+    p[2]=1-p[1]
+    p[3]=dn+ds.amount.of.bias(b,dn)
+    p[4]=1-p[3]
+    return(-sum(y*log(p)))
+}
+ 
+nll.lowThreshold=function(det,dat) {
+    result=0.0
+    for (i in 0:4) {
+        start4=i*4+1
+        end4=start4+3
+        result=result+optimize(nll.lowThreshold.1, interval=c(0,1), y=dat[start4:end4], det=det)$objective
+        result=result-lchoose(dat[start4]+dat[start4+1], dat[start4])-lchoose(dat[start4+2]+dat[start4+3], dat[start4+3])
+    }
+    return(result)
+}
+
+nll.doubleHighThreshold.1=function(g,y,d) {
+    p=1:4
+    p[1]=d+(1-d)*g 
+    p[2]=1-p[1]
+    p[3]=(1-d)*g 
+    p[4]=1-p[3]
+    return(-sum(y*log(p)))
+}
+nll.doubleHighThreshold=function(d,dat) {
+    min=0.0
+    for (i in 0:4) {
+        start2=i*2+1
+        end2=start2+1
+        start4=i*4+1
+        end4=start4+3
+        min=min+optimize(nll.doubleHighThreshold.1, interval=c(0,1), y=dat[start4:end4], d=d)$objective
+        min=min-lchoose(dat[start4]+dat[start4+1], dat[start4])-lchoose(dat[start4+2]+dat[start4+3], dat[start4+3])
+    }
+    return(min)
+}
 
 
 par10=rep(0.5,10)
-zdet=rep(0,2)
-par2=rep(0.5,3)
-est.highThreshold=optimize(nll.highThreshold, interval=c(0,1),dat=data)
 est.binominal=nll.binomial(par10, dat=data)
+est.highThreshold=optimize(nll.highThreshold, interval=c(0,1),dat=data)
+zdet=rep(0,2)
 est.gernalHighThreshold=optim(zdet, nll.gerneralHighThreshold, dat=data)
+par2=rep(0.5,2)
 est.freeVariance=optim(par2, nll.freeVariance, dat=data)
-print(nll.freeVariance(par=rep(0.8,2),dat=data))
+par2=rep(0.5,2)
+est.lowThreshold=optim(par2, nll.lowThreshold, dat=data)
+est.doubleHighThreshold=optimize(nll.doubleHighThreshold, interval=c(0,1),dat=data)
+zdet=rep(0,2)
+print("binominal")
 print(est.binominal)
+print("high threshold")
 print(est.highThreshold$objective)
+print("general threshold")
 print(est.gernalHighThreshold$value)
+print("free variance")
 print(est.freeVariance$value)
+print("low threshold")
+print(est.lowThreshold$value)
+print("double high threshold")
+print(est.doubleHighThreshold$objective)
 })
