@@ -223,8 +223,9 @@ for (i in 1:7) {
     AIC[i]=cal_AIC(i)
 }
 print(models)
+print("negative log likelihood")
 print(logLike)
-print("G_squar")
+print("G squar")
 print(G_squar)
 print("AIC")
 print(AIC)
