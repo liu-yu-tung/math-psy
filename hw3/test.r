@@ -12,7 +12,6 @@ nll.condition=function(par,y) {
     return(-sum(y*log(p)))
 }
 
-# same as modeling book
 nll.binomial=function(par10,dat) {
     model=1:10
     result=0.0
@@ -165,7 +164,6 @@ nll.equalVariance=function(par,dat) {
     return(result)
 }
 
-
 par10=rep(0.5,10)
 est.binominal=nll.binomial(par10, dat=data)
 est.highThreshold=optimize(nll.highThreshold, interval=c(0,1),dat=data)
@@ -177,7 +175,6 @@ par2=rep(0.5,2)
 est.lowThreshold=optim(par2, nll.lowThreshold, dat=data)
 est.doubleHighThreshold=optimize(nll.doubleHighThreshold, interval=c(0,1),dat=data)
 est.equalVariance=optimize(nll.equalVariance, interval=c(0,1), dat=data)
-par1=c(0.5)
 
 print("binominal")
 print(est.binominal)
@@ -194,3 +191,12 @@ print(est.doubleHighThreshold$objective)
 print("equal variance")
 print(est.equalVariance$objective)
 })
+
+G_squar=1:6
+G_squar[1]=2*(est.gernalHighThreshold$value-est.binominal)
+G_squar[2]=2*(est.highThreshold$objective- est.gernalHighThreshold$value)
+G_squar[3]=2*(est.doubleHighThreshold$objective- est.gernalHighThreshold$value )
+G_squar[4]=2*(est.lowThreshold$value-est.binominal)
+G_squar[5]=2*(est.freeVariance$value- est.binominal)
+G_squar[6]=2*(est.equalVariance$objective- est.freeVariance$value)
+print(G_squar)
