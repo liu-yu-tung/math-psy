@@ -1,4 +1,3 @@
-suppressWarnings({
 data=c(404,96,301,199,348,152,235,265,287,213,183,317,251,249,102,398,148,352,20,480)
 
 nll.condition=function(par,y) { 
@@ -164,6 +163,8 @@ nll.equalVariance=function(par,dat) {
     return(result)
 }
 
+suppressWarnings({
+
 par10=rep(0.5,10)
 est.binominal=nll.binomial(par10, dat=data)
 est.highThreshold=optimize(nll.highThreshold, interval=c(0,1),dat=data)
@@ -176,6 +177,7 @@ est.lowThreshold=optim(par2, nll.lowThreshold, dat=data)
 est.doubleHighThreshold=optimize(nll.doubleHighThreshold, interval=c(0,1),dat=data)
 est.equalVariance=optimize(nll.equalVariance, interval=c(0,1), dat=data)
 
+})
 logLike=1:7
 logLike[1]=est.binominal
 logLike[2]=est.gernalHighThreshold$value
@@ -193,9 +195,6 @@ models[4]="free variance"
 models[5]="low threshold"
 models[6]="double high threshold"
 models[7]="equal variance"
-print(models)
-print(logLike)
-})
 
 G_squar=1:6
 cal_G2=function(x, y) {
@@ -207,8 +206,6 @@ G_squar[3]=cal_G2(4,1)
 G_squar[4]=cal_G2(5,1)
 G_squar[5]=cal_G2(6,1)
 G_squar[6]=cal_G2(7,6)
-print("G_squar (left to right)")
-print(G_squar)
 
 params=1:7
 params[1]=10
@@ -225,4 +222,9 @@ cal_AIC=function(index) {
 for (i in 1:7) {
     AIC[i]=cal_AIC(i)
 }
+print(models)
+print(logLike)
+print("G_squar")
+print(G_squar)
+print("AIC")
 print(AIC)
