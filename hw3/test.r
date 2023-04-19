@@ -72,30 +72,6 @@ nll.gerneralHighThreshold=function(zdet,dat) {
     }
     return(result)
 }
-
-nll.freeVariance.1=function(c,y,par) {
-    d=par[1]
-    simga=par[2]
-    p=1:4
-    c=qlogis(c)
-    p[1]=1-pnorm(c,d,simga)
-    p[2]=1-p[1]
-    p[3]=1-pnorm(c)
-    p[4]=1-p[3]
-    return(-sum(y*log(p)))
-}
-
-nll.freeVariance=function(par,dat) {
-    result=0.0
-    for (i in 0:4) {
-        start4=i*4+1
-        end4=start4+3
-        result=result+optimize(nll.freeVariance.1, interval=c(0,1), y=dat[start4:end4], par=par)$objective
-        result=result-lchoose(dat[start4]+dat[start4+1], dat[start4])-lchoose(dat[start4+2]+dat[start4+3], dat[start4+3])
-    }
-    return(result)
-}
-
 ds.amount.of.bias=function(b,p) {
     ifelse(b>0, (1-p)*b, p*b)
 }
@@ -143,6 +119,52 @@ nll.doubleHighThreshold=function(d,dat) {
     return(min)
 }
 
+nll.freeVariance.1=function(c,y,par) {
+    d=par[1]
+    sigma=par[2]
+    p=1:4
+    c=qlogis(c)
+    p[1]=1-pnorm(c,d,sigma)
+    p[2]=1-p[1]
+    p[3]=1-pnorm(c)
+    p[4]=1-p[3]
+    return(-sum(y*log(p)))
+}
+
+nll.freeVariance=function(par,dat) {
+    result=0.0
+    for (i in 0:4) {
+        start4=i*4+1
+        end4=start4+3
+        result=result+optimize(nll.freeVariance.1, interval=c(0,1), y=dat[start4:end4], par=par)$objective
+        result=result-lchoose(dat[start4]+dat[start4+1], dat[start4])-lchoose(dat[start4+2]+dat[start4+3], dat[start4+3])
+    }
+    return(result)
+}
+
+nll.equalVariance.1=function(c,y,par) {
+    d=par
+    sigma=1
+    p=1:4
+    c=qlogis(c)
+    p[1]=1-pnorm(c,d,sigma)
+    p[2]=1-p[1]
+    p[3]=1-pnorm(c)
+    p[4]=1-p[3]
+    return(-sum(y*log(p)))
+}
+
+nll.equalVariance=function(par,dat) {
+    result=0.0
+    for (i in 0:4) {
+        start4=i*4+1
+        end4=start4+3
+        result=result+optimize(nll.equalVariance.1, interval=c(0,1), y=dat[start4:end4], par=par)$objective
+        result=result-lchoose(dat[start4]+dat[start4+1], dat[start4])-lchoose(dat[start4+2]+dat[start4+3], dat[start4+3])
+    }
+    return(result)
+}
+
 
 par10=rep(0.5,10)
 est.binominal=nll.binomial(par10, dat=data)
@@ -154,7 +176,9 @@ est.freeVariance=optim(par2, nll.freeVariance, dat=data)
 par2=rep(0.5,2)
 est.lowThreshold=optim(par2, nll.lowThreshold, dat=data)
 est.doubleHighThreshold=optimize(nll.doubleHighThreshold, interval=c(0,1),dat=data)
-zdet=rep(0,2)
+est.equalVariance=optimize(nll.equalVariance, interval=c(0,1), dat=data)
+par1=c(0.5)
+
 print("binominal")
 print(est.binominal)
 print("high threshold")
@@ -167,4 +191,6 @@ print("low threshold")
 print(est.lowThreshold$value)
 print("double high threshold")
 print(est.doubleHighThreshold$objective)
+print("equal variance")
+print(est.equalVariance$objective)
 })
