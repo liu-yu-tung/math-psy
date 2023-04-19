@@ -193,6 +193,7 @@ models[4]="free variance"
 models[5]="low threshold"
 models[6]="double high threshold"
 models[7]="equal variance"
+print(models)
 print(logLike)
 })
 
@@ -202,7 +203,7 @@ cal_G2=function(x, y) {
 }
 G_squar[1]=cal_G2(2,1)
 G_squar[2]=cal_G2(3,2)
-G_squar[3]=cal_G2(4,2)
+G_squar[3]=cal_G2(4,1)
 G_squar[4]=cal_G2(5,1)
 G_squar[5]=cal_G2(6,1)
 G_squar[6]=cal_G2(7,6)
