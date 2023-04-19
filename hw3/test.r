@@ -176,27 +176,52 @@ est.lowThreshold=optim(par2, nll.lowThreshold, dat=data)
 est.doubleHighThreshold=optimize(nll.doubleHighThreshold, interval=c(0,1),dat=data)
 est.equalVariance=optimize(nll.equalVariance, interval=c(0,1), dat=data)
 
-print("binominal")
-print(est.binominal)
-print("high threshold")
-print(est.highThreshold$objective)
-print("general threshold")
-print(est.gernalHighThreshold$value)
-print("free variance")
-print(est.freeVariance$value)
-print("low threshold")
-print(est.lowThreshold$value)
-print("double high threshold")
-print(est.doubleHighThreshold$objective)
-print("equal variance")
-print(est.equalVariance$objective)
+logLike=1:7
+logLike[1]=est.binominal
+logLike[2]=est.gernalHighThreshold$value
+logLike[3]=est.highThreshold$objective
+logLike[4]=est.doubleHighThreshold$objective
+logLike[5]=est.lowThreshold$value
+logLike[6]=est.freeVariance$value
+logLike[7]=est.equalVariance$objective
+
+models=1:7
+models[1]="binominal"
+models[2]="high threshold"
+models[3]="general threshold"
+models[4]="free variance"
+models[5]="low threshold"
+models[6]="double high threshold"
+models[7]="equal variance"
+print(logLike)
 })
 
 G_squar=1:6
-G_squar[1]=2*(est.gernalHighThreshold$value-est.binominal)
-G_squar[2]=2*(est.highThreshold$objective- est.gernalHighThreshold$value)
-G_squar[3]=2*(est.doubleHighThreshold$objective- est.gernalHighThreshold$value )
-G_squar[4]=2*(est.lowThreshold$value-est.binominal)
-G_squar[5]=2*(est.freeVariance$value- est.binominal)
-G_squar[6]=2*(est.equalVariance$objective- est.freeVariance$value)
+cal_G2=function(x, y) {
+    return(2*(logLike[x]-logLike[y]))
+}
+G_squar[1]=cal_G2(2,1)
+G_squar[2]=cal_G2(3,2)
+G_squar[3]=cal_G2(4,2)
+G_squar[4]=cal_G2(5,1)
+G_squar[5]=cal_G2(6,1)
+G_squar[6]=cal_G2(7,6)
+print("G_squar (left to right)")
 print(G_squar)
+
+params=1:7
+params[1]=10
+params[2]=7
+params[3]=6
+params[4]=6
+params[5]=7
+params[6]=7
+params[8]=6
+AIC=1:7
+cal_AIC=function(index) {
+    return(2*logLike[index]+2*params[index])
+}
+for (i in 1:7) {
+    AIC[i]=cal_AIC(i)
+}
+print(AIC)
